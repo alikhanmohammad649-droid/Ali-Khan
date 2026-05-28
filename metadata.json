@@ -1,0 +1,6 @@
+{
+  "name": "LeadBridge",
+  "description": "A premium business services marketplace where connectors refer clients and earn commissions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

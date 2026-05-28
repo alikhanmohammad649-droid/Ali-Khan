@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      // Sandboxed iframe protection: Make window.fetch writable to prevent polyfill assignment crashes
+      try {
+        const nativeFetch = window.fetch;
+        if (nativeFetch) {
+          Object.defineProperty(window, 'fetch', {
+            value: nativeFetch.bind(window),
+            writable: true,
+            configurable: true
+          });
+        }
+      } catch (e) {
+        console.warn('Sandbox fetch patch skipped:', e);
+      }
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LeadBridge — Premium Services Marketplace</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
