@@ -3,19 +3,45 @@
   <head>
     <meta charset="UTF-8" />
     <script>
-      // Sandboxed iframe protection: Make window.fetch writable to prevent polyfill assignment crashes
-      try {
-        const nativeFetch = window.fetch;
-        if (nativeFetch) {
-          Object.defineProperty(window, 'fetch', {
-            value: nativeFetch.bind(window),
-            writable: true,
-            configurable: true
-          });
+      // Sandboxed iframe protection: Intercept and proxy window.fetch with writable getter/setter to prevent polyfill crashes
+      (function() {
+        try {
+          let currentFetch = window.fetch;
+          if (currentFetch) {
+            const boundFetch = currentFetch.bind(window);
+            currentFetch = boundFetch;
+            try {
+              Object.defineProperty(window, 'fetch', {
+                get() {
+                  return currentFetch;
+                },
+                set(v) {
+                  currentFetch = v;
+                },
+                configurable: true,
+                enumerable: true
+              });
+            } catch (e1) {
+              try {
+                Object.defineProperty(Window.prototype, 'fetch', {
+                  get() {
+                    return currentFetch;
+                  },
+                  set(v) {
+                    currentFetch = v;
+                  },
+                  configurable: true,
+                  enumerable: true
+                });
+              } catch (e2) {
+                console.warn('Sandbox fetch patch could not redefine fetch:', e2);
+              }
+            }
+          }
+        } catch (globalError) {
+          console.warn('Sandbox fetch patch unhandled error:', globalError);
         }
-      } catch (e) {
-        console.warn('Sandbox fetch patch skipped:', e);
-      }
+      })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LeadBridge — Premium Services Marketplace</title>
